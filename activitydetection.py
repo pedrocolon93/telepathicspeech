@@ -6,11 +6,11 @@ import matplotlib.pyplot as plt
 class VoiceActivityDetector():
     """ Use signal energy to detect voice activity in wav file """
 
-    def __init__(self, data, threshold = 0.2, start_band = 100, end_band = 550):
+    def __init__(self, data, threshold = 0.6, start_band = 20, end_band = 500):
         self.data = data
-        self.sample_window = 0.02  # 20 ms
-        self.sample_overlap = 0.01  # 10ms
-        self.speech_window = 0.8  # half a second
+        self.sample_window = 0.015  # 20 ms
+        self.sample_overlap = 0.005  # 10ms
+        self.speech_window = 0.5  # half a second
         self.speech_energy_threshold = threshold  # 60% of energy in voice band
         self.speech_start_band = start_band
         self.speech_end_band = end_band
@@ -135,10 +135,10 @@ class VoiceActivityDetector():
         while not it.finished:
             data_speech[int(it[0])] = data[int(it[0])] * detected_windows[it.index, 1]
             it.iternext()
-        plt.figure()
-        plt.plot(data_speech)
-        plt.plot(data)
-        plt.show()
+        # plt.figure()
+        # plt.plot(data_speech)
+        # plt.plot(data)
+        # plt.show()
         return self
 
     def detect_speech(self):

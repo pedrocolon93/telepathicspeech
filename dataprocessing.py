@@ -2,6 +2,7 @@ import csv
 import matplotlib.pyplot as plt
 import math
 import matlab.engine
+import numpy as np
 
 from activitydetection import VoiceActivityDetector
 
@@ -118,36 +119,23 @@ def find_signals_improved(file):
             pass
     activity_detector = VoiceActivityDetector(data,)
     res = activity_detector.detect_speech()
-    # activity_detector.plot_detected_speech_regions()
+    activity_detector.plot_detected_speech_regions()
     conv = activity_detector.convert_windows_to_labels(res)
-    # activity_detector.plot_detected_speech_regions()
+    activity_detector.plot_detected_speech_regions()
     started = False
     signals = []
-    signalsize = 6000
+    signalsize = 9000
     for period in conv:
-        speech_len = period["speech_end"] - period["speech_begin"]
-        amount_of_mixed_speech = math.floor(speech_len / (signalsize * 1.0))
-        amount_of_mixed_speech = int(amount_of_mixed_speech)
-        if amount_of_mixed_speech > 0:
-            startindex = period["speech_begin"]
-            startindex = int(startindex)
-            for speechsignal in range(0, amount_of_mixed_speech):
-                if startindex + signalsize > len(data):
-                    signals.append(data[startindex - ( (startindex + signalsize)- len(data)):len(data)])
-                    break
-                else:
-                    signals.append(data[startindex:startindex + signalsize])
-                    startindex += signalsize
+        if period["speech_begin"]+signalsize>len(data):
+            #special case where we find a signal at the end of the data.  Just pad it with the last value
+            start = int(period["speech_begin"])
+            end = int(len(data)-1)
+            signals.append(data[start:end]+[np.average(data) for i in range(0,signalsize-(len(data)-1-int(period["speech_begin"])))])
         else:
-            startindex = period["speech_begin"]
-            startindex = int(startindex)
-            if startindex + signalsize > len(data):
-                signals.append(data[startindex - ( (startindex + signalsize)- len(data)):len(data)])
-                break
-            else:
-                signals.append(data[startindex:startindex + signalsize])
-        if len(signals[-1]) != signalsize:
-            pass
+            start = int(period["speech_begin"])
+            end = int(period["speech_begin"]+signalsize)
+            signals.append(data[start:end])
+
     blanks = []
     if len(signals) > 2:
         for index, speechperiod in enumerate(conv):

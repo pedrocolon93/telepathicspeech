@@ -1,5 +1,5 @@
 import serial
-import icatest
+import main
 import dataprocessing
 from scipy.interpolate import interp1d
 import time
@@ -9,7 +9,7 @@ readbuffer = ""
 datacollectionarray = []
 maxdatasize = 15000
 sampletake_secoonds = 20
-icatest.initialize_classifier()
+main.initialize_classifier()
 m = interp1d([0,1023],[0,720])
 while True:
     start = time.time()
@@ -42,7 +42,7 @@ while True:
         if time.time() - start > sampletake_secoonds:
             print "Flushing collected data", len(datacollectionarray)
             extracted = dataprocessing.find_signals(datacollectionarray)
-            result = icatest.classify(extracted)
+            result = main.classify(extracted)
             print result
             datacollectionarray = []
             break
